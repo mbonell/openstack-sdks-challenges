@@ -13,12 +13,14 @@ $cloud = new OpenStack('https://YOUR_IDENTITY_CONTROLLER', array(
 
 $compute = $cloud->computeService('nova', 'YOUR_REGION');
 
-#2: Listing images 
+#3: Listing flavors 
 
-echo ("**Available images** \n");
-$images = $compute->imageList();
+echo ("**Available flavors** \n");
+$flavors = $compute->flavorList();
 
-foreach ($images as $image) {
-    sprintf("Name: %s, ID: %d \n", $image->name, $image->id);
+foreach ($flavors as $flavor) {
+     printf("ID: %s, Name: %s, RAM: %s, VCPUs: %s\n", $flavor->id, $flavor->name, $flavor->ram, $flavor->vcpus);
 }
+
+
 ?>
