@@ -1,7 +1,6 @@
 require "fog/openstack"
 
 #1: Connecting to the cloud
-
 @connection_params = {
 	openstack_auth_url:     "https://YOUR_IDENTITY_CONTROLLER",
 	openstack_username:     "YOUR_USERNAME",
