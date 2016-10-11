@@ -1,4 +1,3 @@
-#5: Launching/Destroying simple instances
 from shade import *
 
 simple_logging(debug=True)
@@ -28,6 +27,3 @@ print "\nServers in the cloud:"
 instances = conn.list_servers()
 for instance in instances:
     print(instance)
-
-print "\nDeleted server:"
-conn.delete_server(name_or_id=instance_name)
