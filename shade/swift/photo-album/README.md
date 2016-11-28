@@ -1,6 +1,6 @@
 # Photo Album!
 
-*Create microservices that implements Swift API to upload and show your pet photo album in a web page.*
+*Create microservices that implements Swift API to upload and show your pet's photo album in a web page.*
 
 Main steps:
 * [Uploader] Create public containers.
