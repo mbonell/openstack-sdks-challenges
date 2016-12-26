@@ -14,4 +14,5 @@ export OS_DOMAIN_ID=$OS_DOMAIN_ID
 
 # Downloading the worker binary and running it
 wget $WORKER_BIN_URL
+sudo chmod +x worker
 ./worker $ORIGINAL_VIDEO_FILE $FORMAT_TO_ENCODE
