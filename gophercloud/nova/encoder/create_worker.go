@@ -35,20 +35,25 @@ func main() {
 		Type:   "computev21",
 	})
 
-	// Create an instance
+	// Script to execte after the instance creation
+	userData := `#!/usr/bin/env bash
+	curl -L -s https://raw.githubusercontent.com/MBonell/openstack-sdks-challenges/master/gophercloud/nova/encoder/init.sh | bash -s --`
+
+	// Create an worker instance
 	server, err := servers.Create(client, servers.CreateOpts{
 		Name:           "worker-" + time.Now().String(),
 		FlavorRef:      os.Getenv("WORKER_SERVER_FLAVOR"),
 		ImageRef:       os.Getenv("WORKER_SERVER_IMAGE"),
 		Networks:       []servers.Network{servers.Network{UUID: os.Getenv("WORKER_SERVER_NETWORK")}},
 		SecurityGroups: []string{"worker"},
+		UserData:       []byte(userData),
 	}).Extract()
 
 	if err != nil {
-		fmt.Printf("Unable to create server: %s", err)
+		fmt.Printf("Unable to create worker: %s", err)
 		return
 	}
 
-	fmt.Printf("Server created!, ID: %s", server.ID)
+	fmt.Printf("Worker created!, ID: %s", server.ID)
 
 }
