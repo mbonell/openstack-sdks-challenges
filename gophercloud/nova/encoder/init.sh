@@ -2,7 +2,7 @@
 
 WORKER_BIN_URL=https://raw.githubusercontent.com/MBonell/openstack-sdks-challenges/master/gophercloud/nova/encoder/worker/bin/worker
 
-while getopts "OS_AUTH_URL:OS_PROJECT_NAME:OS_USERNAME:OS_PASSWORD:OS_DOMAIN_ID:ORIGINAL_VIDEO_FILE:FORMAT_TO_ENCODE" ARG; do
+while getopts OS_AUTH_URL:OS_PROJECT_NAME:OS_USERNAME:OS_PASSWORD:OS_DOMAIN_ID:ORIGINAL_VIDEO_FILE:FORMAT_TO_ENCODE: ARG; do
     case $ARG in 
         OS_AUTH_URL)
             OS_AUTH_URL=$OPTARG

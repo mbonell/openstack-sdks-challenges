@@ -62,7 +62,7 @@ func main() {
 		video,
 		format,
 	)
-
+	fmt.Println(userData)
 	// Create an worker instance
 	server, err := servers.Create(client, servers.CreateOpts{
 		Name:           "worker-" + time.Now().String(),
