@@ -52,8 +52,8 @@ func main() {
 
 	// Script to execte after the instance creation
 	userData := fmt.Sprintf(`#!/usr/bin/env bash
-	curl -L -s https://raw.githubusercontent.com/MBonell/openstack-sdks-challenges/master/gophercloud/nova/encoder/init.sh | bash -s -- \
-	-OS_AUTH_URL %s -OS_PROJECT_NAME %s -OS_USERNAME %s -OS_PASSWORD %s -OS_DOMAIN_ID %s -ORIGINAL_VIDEO_FILE %s -FORMAT_TO_ENCODE %s`,
+	curl -L -s https://raw.githubusercontent.com/MBonell/openstack-sdks-challenges/master/gophercloud/nova/encoder/init.sh
+	OS_AUTH_URL=%s OS_PROJECT_NAME=%s OS_USERNAME=%s OS_PASSWORD=%s OS_DOMAIN_ID=%s ORIGINAL_VIDEO_FILE=%s FORMAT_TO_ENCODE=%s bash init.sh`,
 		authUrl,
 		project,
 		username,
@@ -62,7 +62,7 @@ func main() {
 		video,
 		format,
 	)
-	fmt.Println(userData)
+
 	// Create an worker instance
 	server, err := servers.Create(client, servers.CreateOpts{
 		Name:           "worker-" + time.Now().String(),
