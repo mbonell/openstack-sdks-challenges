@@ -13,8 +13,6 @@ export OS_USERNAME=$OS_USERNAME
 export OS_PASSWORD=$OS_PASSWORD
 export OS_DOMAIN_ID=$OS_DOMAIN_ID
 
-printenv
-
 # Downloading the worker binary and running it
 wget $WORKER_BIN_URL
 sudo chmod +x worker

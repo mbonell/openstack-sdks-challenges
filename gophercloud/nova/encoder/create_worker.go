@@ -1,4 +1,5 @@
-//TODO
+// Using the OpenStack Nova API (Gophercloud), the create worker script launch encoding workers that
+// receive a video URL from the cloud (Swift object) and convert it into the format selected by the user.
 
 package main
 
@@ -19,8 +20,13 @@ func main() {
 	project := os.Getenv("OS_PROJECT_NAME")
 	domain := os.Getenv("OS_DOMAIN_ID")
 	region := os.Getenv("OS_REGION_NAME")
+
 	video := os.Getenv("ORIGINAL_VIDEO_FILE")
 	format := os.Getenv("FORMAT_TO_ENCODE")
+
+	workerImage := os.Getenv("WORKER_SERVER_IMAGE")
+	workerFlavor := os.Getenv("WORKER_SERVER_FLAVOR")
+	workerNetwork := os.Getenv("WORKER_SERVER_NETWORK")
 
 	// Validate required variables
 	if video == "" || format == "" {
@@ -52,7 +58,7 @@ func main() {
 
 	// Script to execte after the instance creation
 	userData := fmt.Sprintf(`#!/usr/bin/env bash
-	curl -L -s https://raw.githubusercontent.com/MBonell/openstack-sdks-challenges/master/gophercloud/nova/encoder/init.sh
+	wget https://raw.githubusercontent.com/MBonell/openstack-sdks-challenges/master/gophercloud/nova/encoder/init.sh
 	OS_AUTH_URL=%s OS_PROJECT_NAME=%s OS_USERNAME=%s OS_PASSWORD=%s OS_DOMAIN_ID=%s ORIGINAL_VIDEO_FILE=%s FORMAT_TO_ENCODE=%s bash init.sh`,
 		authUrl,
 		project,
@@ -66,9 +72,9 @@ func main() {
 	// Create an worker instance
 	server, err := servers.Create(client, servers.CreateOpts{
 		Name:           "worker-" + time.Now().String(),
-		FlavorRef:      os.Getenv("WORKER_SERVER_FLAVOR"),
-		ImageRef:       os.Getenv("WORKER_SERVER_IMAGE"),
-		Networks:       []servers.Network{servers.Network{UUID: os.Getenv("WORKER_SERVER_NETWORK")}},
+		FlavorRef:      workerFlavor,
+		ImageRef:       workerImage,
+		Networks:       []servers.Network{servers.Network{UUID: workerNetwork}},
 		SecurityGroups: []string{"worker"},
 		UserData:       []byte(userData),
 	}).Extract()
