@@ -13,6 +13,21 @@ import (
 
 func main() {
 
+	authUrl := os.Getenv("OS_AUTH_URL")
+	username := os.Getenv("OS_USERNAME")
+	password := os.Getenv("OS_PASSWORD")
+	project := os.Getenv("OS_PROJECT_NAME")
+	domain := os.Getenv("OS_DOMAIN_ID")
+	region := os.Getenv("OS_REGION_NAME")
+	video := os.Getenv("ORIGINAL_VIDEO_FILE")
+	format := os.Getenv("FORMAT_TO_ENCODE")
+
+	// Validate required variables
+	if video == "" || format == "" {
+		fmt.Println("Video URL and/or format is required!")
+		return
+	}
+
 	// Set cloud credentials
 	opts, err := openstack.AuthOptionsFromEnv()
 
@@ -31,21 +46,21 @@ func main() {
 
 	// Using the compute service with the cloud
 	client, err := openstack.NewComputeV2(provider, gophercloud.EndpointOpts{
-		Region: os.Getenv("OS_REGION_NAME"),
+		Region: region,
 		Type:   "computev21",
 	})
 
 	// Script to execte after the instance creation
-	userData := fmt.Sprint(`#!/usr/bin/env bash
+	userData := fmt.Sprintf(`#!/usr/bin/env bash
 	curl -L -s https://raw.githubusercontent.com/MBonell/openstack-sdks-challenges/master/gophercloud/nova/encoder/init.sh | bash -s -- \
 	-OS_AUTH_URL %s -OS_PROJECT_NAME %s -OS_USERNAME %s -OS_PASSWORD %s -OS_DOMAIN_ID %s -ORIGINAL_VIDEO_FILE %s -FORMAT_TO_ENCODE %s`,
-		os.Getenv("OS_REGION_NAME"),
-		os.Getenv("OS_PROJECT_NAME"),
-		os.Getenv("OS_USERNAME"),
-		os.Getenv("OS_PASSWORD"),
-		os.Getenv("OS_DOMAIN_ID"),
-		os.Getenv("ORIGINAL_VIDEO_FILE"),
-		os.Getenv("FORMAT_TO_ENCODE"),
+		authUrl,
+		project,
+		username,
+		password,
+		domain,
+		video,
+		format,
 	)
 
 	// Create an worker instance
