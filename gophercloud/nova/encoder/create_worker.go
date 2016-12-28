@@ -1,5 +1,5 @@
 // Using the OpenStack Nova API (Gophercloud), the create worker script launch encoding workers that
-// receive a video URL from the cloud (Swift object) and convert it into the format selected by the user.
+// receive a video name and container from the cloud (Swift object) and convert it into the format selected by the user.
 
 package main
 
@@ -17,11 +17,11 @@ func main() {
 	authUrl := os.Getenv("OS_AUTH_URL")
 	username := os.Getenv("OS_USERNAME")
 	password := os.Getenv("OS_PASSWORD")
-	project := os.Getenv("OS_PROJECT_NAME")
 	domain := os.Getenv("OS_DOMAIN_ID")
 	region := os.Getenv("OS_REGION_NAME")
 
-	video := os.Getenv("ORIGINAL_VIDEO_FILE")
+	videoContainer := os.Getenv("ORIGINAL_VIDEO_CONTAINER")
+	videoName := os.Getenv("ORIGINAL_VIDEO_NAME")
 	format := os.Getenv("FORMAT_TO_ENCODE")
 
 	workerImage := os.Getenv("WORKER_SERVER_IMAGE")
@@ -29,22 +29,18 @@ func main() {
 	workerNetwork := os.Getenv("WORKER_SERVER_NETWORK")
 
 	// Validate required variables
-	if video == "" || format == "" {
-		fmt.Println("Video URL and/or format is required!")
+	if videoContainer == "" || videoName == "" || format == "" {
+		fmt.Println("Video container, name and/or format is required!")
 		return
 	}
 
-	// Set cloud credentials
-	opts, err := openstack.AuthOptionsFromEnv()
-
-	if err != nil {
-		fmt.Println(err)
+	// Validate compatible formats
+	if format != "mp4" && format != "mpeg" && format != "webm" {
+		fmt.Println("Format not compatible! Only mp4, mpeg and webm are supported")
 		return
 	}
 
-	// Create connection with the cloud
-	provider, err := openstack.AuthenticatedClient(opts)
-
+	provider, err := GetOpenStackProvider()
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -59,13 +55,15 @@ func main() {
 	// Script to execte after the instance creation
 	userData := fmt.Sprintf(`#!/usr/bin/env bash
 	wget https://raw.githubusercontent.com/MBonell/openstack-sdks-challenges/master/gophercloud/nova/encoder/init.sh
-	OS_AUTH_URL=%s OS_PROJECT_NAME=%s OS_USERNAME=%s OS_PASSWORD=%s OS_DOMAIN_ID=%s ORIGINAL_VIDEO_FILE=%s FORMAT_TO_ENCODE=%s bash init.sh`,
+	OS_AUTH_URL=%s OS_USERNAME=%s OS_PASSWORD=%s OS_DOMAIN_ID=%s OS_REGION_NAME=%s \
+	ORIGINAL_VIDEO_CONTAINER=%s ORIGINAL_VIDEO_NAME=% FORMAT_TO_ENCODE=%s bash init.sh`,
 		authUrl,
-		project,
 		username,
 		password,
 		domain,
-		video,
+		region,
+		videoContainer,
+		videoName,
 		format,
 	)
 
@@ -85,5 +83,25 @@ func main() {
 	}
 
 	fmt.Printf("Worker created!, ID: %s", server.ID)
+
+}
+
+func GetOpenStackProvider() (*gophercloud.ProviderClient, error) {
+
+	// Set cloud credentials
+	opts, err := openstack.AuthOptionsFromEnv()
+
+	if err != nil {
+		return nil, err
+	}
+
+	// Create connection with the cloud
+	provider, err := openstack.AuthenticatedClient(opts)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return provider, nil
 
 }
