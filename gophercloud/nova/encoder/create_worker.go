@@ -67,7 +67,7 @@ func main() {
 		format,
 	)
 
-	// Create an worker instance
+	// Create a worker instance
 	server, err := servers.Create(client, servers.CreateOpts{
 		Name:           "worker-" + time.Now().Format("2006-01-02-15:04:05"),
 		FlavorRef:      workerFlavor,
