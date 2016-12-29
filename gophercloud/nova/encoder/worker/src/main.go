@@ -1,7 +1,7 @@
 // The worker will receive the original video and container name to download it from the cloud.
 // The format to encode the video (MP4, MPEG, WEBM) will be sent to the worker as well.
 // Then the worker will execute the encoding task and at the end it will upload the new encoded videos to the cloud
-// though the object storage API.
+// through the object storage API.
 
 package main
 

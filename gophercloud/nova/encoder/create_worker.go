@@ -30,7 +30,7 @@ func main() {
 
 	// Validate required variables
 	if videoContainer == "" || videoName == "" || format == "" {
-		fmt.Println("Video container, name and/or format is required!")
+		fmt.Println("The following env vars are required: video container, video name and format")
 		return
 	}
 
@@ -56,7 +56,7 @@ func main() {
 	userData := fmt.Sprintf(`#!/usr/bin/env bash
 	wget https://raw.githubusercontent.com/MBonell/openstack-sdks-challenges/master/gophercloud/nova/encoder/init.sh
 	OS_AUTH_URL=%s OS_USERNAME=%s OS_PASSWORD=%s OS_DOMAIN_ID=%s OS_REGION_NAME=%s \
-	ORIGINAL_VIDEO_CONTAINER=%s ORIGINAL_VIDEO_NAME=% FORMAT_TO_ENCODE=%s bash init.sh`,
+	ORIGINAL_VIDEO_CONTAINER=%s ORIGINAL_VIDEO_NAME=%s FORMAT_TO_ENCODE=%s bash init.sh`,
 		authUrl,
 		username,
 		password,
@@ -69,7 +69,7 @@ func main() {
 
 	// Create an worker instance
 	server, err := servers.Create(client, servers.CreateOpts{
-		Name:           "worker-" + time.Now().String(),
+		Name:           "worker-" + time.Now().Format("2006-01-02-15:04:05"),
 		FlavorRef:      workerFlavor,
 		ImageRef:       workerImage,
 		Networks:       []servers.Network{servers.Network{UUID: workerNetwork}},
