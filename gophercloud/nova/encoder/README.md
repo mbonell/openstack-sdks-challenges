@@ -1,9 +1,17 @@
 # Video Encoding: Sample App
-The application uses Nova API to launch encoding workers that receive video objects and convert them into different formats. The encoder app architecture should have a manager microservice that manages the job requests and launch a job worker to perform the encoding task. The code sample uses Gophercloud (Go) as SDK and ffmpeg for transcoding the video files.
+The application uses Nova API to launch encoding workers that receive video objects and convert them into different formats. The encoder app architecture should have a manager microservice that manages the job requests and launch a job worker to perform the encoding task. The code sample uses [Gophercloud](https://github.com/gophercloud/gophercloud) (Go) as SDK and [ffmpeg](https://ffmpeg.org/) for transcoding the video files.
 
 ## App flow
-1. TODO
-1. TODO
+1. Creating a worker
+  * Select the image, flavor, network and security groups for the worker instance.
+  * Set as env vars the format to encode, the container and video name where the video to encode is stored in the cloud.
+  * Specify the bash script for the cloud-init service that install the worker dependencies (golang, ffmpeg), download the worker binary and run it once the instance is ready.
+  * Through the compute API, launch the worker instance specifying the infrastructure values and user data script.
+1. Worker initialization
+  * Once the instance is ready, the init script will update the dependencies, install ffmpeg, set the cloud credentials as environment variables and download and run the encoding app.
+1. Worker execution
+  * The encoding app installed in the worker will receive the original video file as a Swift object (container and object name) and the format to encode the video (MP4, MPEG, WEBM). Then the worker will download the original video from the cloud, execute the encoding task and at the end it will upload the new encoded video to the cloud through the object storage API.
+
 
 ## Cloud services used
 * Compute (Nova)
@@ -36,4 +44,9 @@ export WORKER_SERVER_NETWORK=7004a83a-13d3-4dcd-8cf5-52af1ace4cae
 export ORIGINAL_VIDEO_CONTAINER=original-videos
 export ORIGINAL_VIDEO_NAME=prairie-dog.mov
 export FORMAT_TO_ENCODE=webm
+```
+
+### Create a worker to encode videos
+```
+$ go run create_worker.go
 ```
