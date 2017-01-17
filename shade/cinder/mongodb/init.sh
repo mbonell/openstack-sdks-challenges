@@ -15,4 +15,5 @@ sudo apt-get update
 sudo apt-get install mongodb-org -y
 
 # Verify that MongoDB has started successfully
-cat /var/log/mongodb/mongod.log
+sudo service mongod start
+sudo service mongod status

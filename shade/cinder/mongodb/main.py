@@ -35,6 +35,7 @@ database_server = conn.create_server(wait=True, auto_ip=False,
     image = image_id,
     flavor = flavor_id,
     network = private_network_id,
+    key_name = 'marcela-ws',
     security_groups = [sec_group_name],
     userdata = ex_userdata)
 
