@@ -9,7 +9,7 @@ The service uses Cinder API to add persistent storage and Nova API to launch a M
   * Set as env vars the name of your database, user and password.
   * Through the compute API, launch the MongoDB instance specifying the infrastructure values and user data script.
 1. Adding persistent storage to the MongoDB server
-  * Once the database server is created, the Cinder volume will be attached to it and then the init script will update the dependencies, install MongoDB, format the volume, mount it in the MongoDB data files location and create the database with its user and password.
+  * Once the database server is created, the Cinder volume will be attached to it and then the init script will update the dependencies, install MongoDB, create a filesystem the volume, mount it in the MongoDB data files location and create the database with its user and password.
 
 ## Cloud services used
 * Block Storage (Cinder)
