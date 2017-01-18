@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Preparing the empty volume
+# Create a filesystem in the empty volume
 sudo mke2fs /dev/vdb
 
 # Link the volume to the MongoDB data files
