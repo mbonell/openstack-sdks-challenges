@@ -8,21 +8,23 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"github.com/gophercloud/gophercloud"
-	"github.com/gophercloud/gophercloud/openstack"
-	"github.com/gophercloud/gophercloud/openstack/objectstorage/v1/objects"
 	"io/ioutil"
+	"log"
 	"os"
 	"os/exec"
 	"path"
 	"time"
+
+	"github.com/gophercloud/gophercloud"
+	"github.com/gophercloud/gophercloud/openstack"
+	"github.com/gophercloud/gophercloud/openstack/objectstorage/v1/objects"
 )
 
 func main() {
 	args := os.Args[1:]
 
 	if len(args) < 3 {
-		fmt.Println("Video container, name  and/or format is required!")
+		log.Println("[Error] Video container, name and/or format are required!")
 		return
 	}
 
@@ -32,73 +34,71 @@ func main() {
 
 	// Validate compatible formats
 	if format != "mp4" && format != "mpeg" && format != "webm" {
-		fmt.Println("Format not compatible! Only mp4, mpeg and webm are supported")
+		log.Println("[Error] Format not compatible! Only mp4, mpeg and webm are supported.")
 		return
 	}
 
-	provider, err := GetOpenStackProvider()
+	provider, err := getOpenStackProvider()
 	if err != nil {
-		fmt.Println(err)
+		log.Println("[Error] " + err.Error())
 		return
 	}
 
 	region := os.Getenv("OS_REGION_NAME")
-	objectStorage, err := GetServiceObjectStorage(provider, region)
+	objectStorage, err := getServiceObjectStorage(provider, region)
 	if err != nil {
-		fmt.Println(err)
+		log.Println("[Error] " + err.Error())
 		return
 	}
 
-	fmt.Println("[WORKER] Downloading video from the cloud...")
+	log.Println("[WORKER] Downloading video from the cloud...")
 	objectPath := path.Join(os.TempDir(), videoName)
-	err = DownloadObject(objectStorage, videoContainer, videoName, objectPath)
+	err = downloadObject(objectStorage, videoContainer, videoName, objectPath)
 	if err != nil {
-		fmt.Println(err)
+		log.Println("[Error] " + err.Error())
 		return
 	}
 
-	fmt.Println("[WORKER] Starting the video encoding...")
+	log.Println("[WORKER] Starting the video encoding...")
 	encodedName := fmt.Sprintf("%s-%s.%s", videoName, time.Now().Format("2006-01-02-15:04:05"), format)
 	encodedPath := path.Join(os.TempDir(), encodedName)
 
 	cmd := exec.Command("ffmpeg", "-i", objectPath, encodedPath)
 	err = cmd.Start()
 	if err != nil {
-		fmt.Printf("Error during encoding execution: %s \n", err)
+		log.Printf("Error during encoding execution: %s \n", err.Error())
 		return
 	}
 
-	fmt.Println("[WORKER] Waiting for video encoding to finish...")
+	log.Println("[WORKER] Waiting for video encoding to finish...")
 	err = cmd.Wait()
 	if err != nil {
-		fmt.Println(err)
+		log.Println("[Error] " + err.Error())
 		return
 	}
 
-	fmt.Println("[WORKER] Uploading encoded video to the cloud...")
-	err = UploadObject(objectStorage, "encoded-videos", encodedName, encodedPath)
+	log.Println("[WORKER] Uploading encoded video to the cloud...")
+	err = uploadObject(objectStorage, "encoded-videos", encodedName, encodedPath)
 	if err != nil {
-		fmt.Println(err)
+		log.Println("[Error] " + err.Error())
 		return
 	}
 
-	fmt.Println("[WORKER] The encoded task was completed with success!")
+	log.Println("[WORKER] The encoded task was completed with success!")
 	os.Remove(objectPath)
 	os.Remove(encodedPath)
 }
 
-func GetOpenStackProvider() (*gophercloud.ProviderClient, error) {
+// getOpenStackProvider reads credentials from the environment variables and
+// creates a connection with the provided OpenStack cloud.
+func getOpenStackProvider() (*gophercloud.ProviderClient, error) {
 
-	// Set cloud credentials
 	opts, err := openstack.AuthOptionsFromEnv()
-
 	if err != nil {
 		return nil, err
 	}
 
-	// Create connection with the cloud
 	provider, err := openstack.AuthenticatedClient(opts)
-
 	if err != nil {
 		return nil, err
 	}
@@ -107,7 +107,8 @@ func GetOpenStackProvider() (*gophercloud.ProviderClient, error) {
 
 }
 
-func GetServiceObjectStorage(provider *gophercloud.ProviderClient, region string) (*gophercloud.ServiceClient, error) {
+// getServiceObjectStorage provides a object storage client.
+func getServiceObjectStorage(provider *gophercloud.ProviderClient, region string) (*gophercloud.ServiceClient, error) {
 
 	service, err := openstack.NewObjectStorageV1(provider, gophercloud.EndpointOpts{
 		Region: region,
@@ -121,7 +122,9 @@ func GetServiceObjectStorage(provider *gophercloud.ProviderClient, region string
 
 }
 
-func DownloadObject(service *gophercloud.ServiceClient, containerName, objectName, path string) error {
+// downloadObject uses the object storage service to download an object from the cloud and
+// stored it in the specified filesystem path.
+func downloadObject(service *gophercloud.ServiceClient, containerName, objectName, path string) error {
 
 	result := objects.Download(service, containerName, objectName, nil)
 	content, err := result.ExtractContent()
@@ -135,7 +138,9 @@ func DownloadObject(service *gophercloud.ServiceClient, containerName, objectNam
 
 }
 
-func UploadObject(service *gophercloud.ServiceClient, containerName, objectName, objectPath string) error {
+// uploadObject uses the object storage service to upload a file from a path in the filesystem to
+// a specific storage container in the cloud.
+func uploadObject(service *gophercloud.ServiceClient, containerName, objectName, objectPath string) error {
 
 	f, err := os.Open(objectPath)
 	defer f.Close()
