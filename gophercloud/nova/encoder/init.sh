@@ -12,6 +12,7 @@ export OS_REGION_NAME=$OS_REGION_NAME
 export OS_USERNAME=$OS_USERNAME
 export OS_PASSWORD=$OS_PASSWORD
 export OS_DOMAIN_ID=$OS_DOMAIN_ID
+export OS_TENANT_NAME=$OS_TENANT_NAME
 
 # Downloading the worker binary and running it
 wget $WORKER_BIN_URL
