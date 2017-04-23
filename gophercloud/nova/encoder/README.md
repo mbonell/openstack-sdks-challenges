@@ -5,7 +5,7 @@ The application uses Nova API to launch encoding workers that receive video obje
 1. Creating a worker
    1. Select the image, flavor, network and security groups for the worker instance.
    1. Set as env vars the format to encode, the container and video name where the video to encode is stored in the cloud.
-   1. Specify the bash script for the cloud-init service that install the worker dependencies (golang, ffmpeg), download the worker binary and run it once the instance is ready.
+   1. Specify the bash script for the cloud-init service that install the worker dependencies (ffmpeg), download the worker binary and run it once the instance is ready.
    1. Through the compute API, launch the worker instance specifying the infrastructure values and user data script.
 1. Worker initialization
    1. Once the instance is ready, the init script will update the dependencies, install ffmpeg, set the cloud credentials as environment variables and download and run the encoding app.
