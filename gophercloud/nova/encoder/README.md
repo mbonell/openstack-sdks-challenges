@@ -3,15 +3,14 @@ The application uses Nova API to launch encoding workers that receive video obje
 
 ## App flow
 1. Creating a worker
-  * Select the image, flavor, network and security groups for the worker instance.
-  * Set as env vars the format to encode, the container and video name where the video to encode is stored in the cloud.
-  * Specify the bash script for the cloud-init service that install the worker dependencies (golang, ffmpeg), download the worker binary and run it once the instance is ready.
-  * Through the compute API, launch the worker instance specifying the infrastructure values and user data script.
+   1. Select the image, flavor, network and security groups for the worker instance.
+   1. Set as env vars the format to encode, the container and video name where the video to encode is stored in the cloud.
+   1. Specify the bash script for the cloud-init service that install the worker dependencies (golang, ffmpeg), download the worker binary and run it once the instance is ready.
+   1. Through the compute API, launch the worker instance specifying the infrastructure values and user data script.
 1. Worker initialization
-  * Once the instance is ready, the init script will update the dependencies, install ffmpeg, set the cloud credentials as environment variables and download and run the encoding app.
+   1. Once the instance is ready, the init script will update the dependencies, install ffmpeg, set the cloud credentials as environment variables and download and run the encoding app.
 1. Worker execution
-  * The encoding app installed in the worker will receive the original video file as a Swift object (container and object name) and the format to encode the video (MP4, MPEG, WEBM). Then the worker will download the original video from the cloud, execute the encoding task and at the end it will upload the new encoded video to the cloud through the object storage API.
-
+   1. The encoding app installed in the worker will receive the original video file as a Swift object (container and object name) and the format to encode the video (MP4, MPEG, WEBM). Then the worker will download the original video from the cloud, execute the encoding task and at the end it will upload the new encoded video to the cloud through the object storage API.
 
 ## Cloud services used
 * Compute (Nova)
