@@ -3,13 +3,13 @@ The service uses Cinder API to add persistent storage and Nova API to launch a M
 
 ## Service flow
 1. Creating the Cinder volume
-  * The persistent volume should be created as first step.
+   1. The persistent volume should be created as first step.
 1. Creating a MongoDB server
-  * Select the image, flavor, network and security groups for the server instance.
-  * Set as env vars the name of your database, user and password.
-  * Through the compute API, launch the MongoDB instance specifying the infrastructure values and user data script.
+   1. Select the image, flavor, network and security groups for the server instance.
+   1. Set as env vars the name of your database, user and password.
+   1. Through the compute API, launch the MongoDB instance specifying the infrastructure values and user data script.
 1. Adding persistent storage to the MongoDB server
-  * Once the database server is created, the Cinder volume will be attached to it and then the init script will update the dependencies, install MongoDB, create a filesystem the volume, mount it in the MongoDB data files location and create the database with its user and password.
+   1. Once the database server is created, the Cinder volume will be attached to it and then the init script will update the dependencies, install MongoDB, create a filesystem the volume, mount it in the MongoDB data files location and create the database with its user and password.
 
 ## Cloud services used
 * Block Storage (Cinder)
